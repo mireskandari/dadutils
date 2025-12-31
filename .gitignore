@@ -2,6 +2,6 @@ build/bin
 node_modules
 frontend/dist
 
-# Ghostscript binaries (too large for git, download separately)
-binaries/darwin/
-binaries/windows/
+# Ghostscript binaries are committed for release builds
+# binaries/darwin/gs (~55MB)
+# binaries/windows/gswin64c.exe + gsdll64.dll (~27MB)
