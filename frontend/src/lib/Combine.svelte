@@ -93,6 +93,7 @@
   $: canMergePages = selectedIds.length === 2;
   $: canEditPages = selectedIds.length === 1;
   $: canCombine = documents.length >= 2;
+  $: canSaveSingle = documents.length === 1;
   $: totalPages = documents.reduce((sum, d) => sum + d.pageCount, 0);
 
   // Actions
@@ -244,11 +245,17 @@
       if (reordered) {
         // Replace the document
         const index = documents.findIndex(d => d.id === editingDoc.id);
+        const oldId = editingDoc.id;
         documents = [
           ...documents.slice(0, index),
           { ...reordered, pageOrder: editPageOrder },
           ...documents.slice(index + 1)
         ];
+
+        // Clean up old thumbnail and regenerate for new document
+        const { [oldId]: _, ...rest } = thumbnails;
+        thumbnails = rest;
+        generateThumbnail(reordered);
       }
     } catch (e) {
       error = e.message || 'Reorder failed';
@@ -257,6 +264,28 @@
       showEditPagesDialog = false;
       editingDoc = null;
       selectedIds = [];
+    }
+  }
+
+  // Save single document (for reordered PDFs)
+  async function handleSaveSingle() {
+    if (!canSaveSingle) return;
+
+    const doc = documents[0];
+    try {
+      const suggestedName = doc.name.replace('.pdf', '-reordered.pdf');
+      savedPath = await SaveFile(doc.path, suggestedName);
+      if (savedPath) {
+        result = {
+          success: true,
+          fileCount: 1,
+          pageCount: doc.pageCount,
+          outputSize: doc.size,
+          outputPath: doc.path
+        };
+      }
+    } catch (e) {
+      error = e.message || 'Save failed';
     }
   }
 
@@ -401,13 +430,21 @@
           </div>
         {/if}
 
-        <button
-          class="btn primary combine-btn"
-          on:click={handleCombine}
-          disabled={!canCombine}
-        >
-          Combine ({totalPages} pages)
-        </button>
+        {#if canCombine}
+          <button
+            class="btn primary combine-btn"
+            on:click={handleCombine}
+          >
+            Combine ({totalPages} pages)
+          </button>
+        {:else if canSaveSingle}
+          <button
+            class="btn primary combine-btn"
+            on:click={handleSaveSingle}
+          >
+            Save PDF ({totalPages} pages)
+          </button>
+        {/if}
       {/if}
 
       <!-- Drop zone for adding more files -->
