@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func init() {
@@ -177,12 +178,9 @@ func TestThumbnailCacheDir_DifferentForModifiedFile(t *testing.T) {
 	// Get cache dir
 	cacheDir1 := getThumbnailCacheDir(tmpFile.Name())
 
-	// Touch file (change modification time)
-	now := os.FileInfo(nil)
-	_ = now // unused but shows intent
-
-	// Simulate file modification by writing to it
-	if err := os.WriteFile(tmpFile.Name(), []byte("modified"), 0644); err != nil {
+	// Explicitly change modification time to ensure it's different
+	futureTime := time.Now().Add(time.Hour)
+	if err := os.Chtimes(tmpFile.Name(), futureTime, futureTime); err != nil {
 		t.Fatal(err)
 	}
 
