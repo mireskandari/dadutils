@@ -46,6 +46,11 @@ jobs:
             chmod +x build/bin/DadsPDFTools.app/Contents/Resources/gs
           fi
 
+      - name: Ad-hoc code sign
+        run: |
+          codesign --force --deep -s - build/bin/DadsPDFTools.app
+          echo "App signed with ad-hoc signature"
+
       - name: Create ZIP
         run: |
           cd build/bin
