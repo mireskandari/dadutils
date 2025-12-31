@@ -2,6 +2,9 @@ build/bin
 node_modules
 frontend/dist
 
+# Test artifacts (generated PDFs in pdf/ directory)
+pdf/*.pdf
+
 # Ghostscript binaries are committed for release builds
 # binaries/darwin/gs (~55MB)
 # binaries/windows/gswin64c.exe + gsdll64.dll (~27MB)
