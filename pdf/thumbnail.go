@@ -94,7 +94,7 @@ func GenerateAllThumbnails(ctx context.Context, pdfPath string, width, height in
 		"-r96", // 96 DPI for better quality thumbnails
 		fmt.Sprintf("-g%dx%d", width, height),
 		"-dPDFFitPage",
-		"-dTextAlphaBits=4",   // Anti-aliasing for text
+		"-dTextAlphaBits=4",     // Anti-aliasing for text
 		"-dGraphicsAlphaBits=4", // Anti-aliasing for graphics
 		fmt.Sprintf("-sOutputFile=%s", outPattern),
 		pdfPath,
