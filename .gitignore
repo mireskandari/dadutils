@@ -2,8 +2,9 @@ build/bin
 node_modules
 frontend/dist
 
-# Test artifacts (generated PDFs in pdf/ directory)
-pdf/*.pdf
+# Test artifacts
+*.pdf
+!test/fixtures/**/*.pdf
 
 # Ghostscript binaries are committed for release builds
 # binaries/darwin/gs (~55MB)
