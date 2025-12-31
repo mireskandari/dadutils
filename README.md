@@ -2,10 +2,18 @@
 
 A lightweight, open-source PDF toolset built with [Wails](https://wails.io/) (Go + Svelte).
 
+## Download
+
+Get the latest release for your platform:
+
+- **Windows**: [Download Installer](https://github.com/mireskandari/dadjoke/releases/latest)
+- **macOS (Apple Silicon)**: [Download ZIP](https://github.com/mireskandari/dadjoke/releases/latest)
+
 ## Features
 
 - **Compress**: Reduce PDF file size using Ghostscript presets (screen, ebook, printer, prepress)
 - **Combine**: Merge multiple PDFs into one, with support for interleaving and page reordering
+- **Thumbnails**: Visual page previews when editing and reordering pages
 - **Split**: *(Coming Soon)* Split PDFs by page ranges
 - **Rotate**: *(Coming Soon)* Rotate pages within a PDF
 
@@ -13,16 +21,17 @@ A lightweight, open-source PDF toolset built with [Wails](https://wails.io/) (Go
 
 ### Runtime Dependencies
 
-**Ghostscript** is required for PDF compression:
+**Ghostscript** is bundled with the app for macOS and Windows. No additional installation required.
 
-- **macOS**: `brew install ghostscript`
-- **Linux**: `sudo apt install ghostscript`
-- **Windows**: Bundled with the installer
+For **Linux**, install Ghostscript manually:
+```bash
+sudo apt install ghostscript
+```
 
 ### Development
 
 - Go 1.21+
-- Node.js 18+ (or Bun)
+- Bun (or Node.js 18+)
 - Wails CLI: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
 
 ## Development
@@ -44,10 +53,14 @@ go test -v ./...
 # Build for current platform
 wails build
 
-# Build for specific platform
-wails build -platform darwin/universal
-wails build -platform windows/amd64
-wails build -platform linux/amd64
+# Build for macOS (arm64)
+make build-mac
+
+# Build for Windows (with installer)
+make build-windows
+
+# Build for Linux
+make build-linux
 ```
 
 ## License
@@ -60,6 +73,6 @@ See [LICENSE](LICENSE) for the full license text.
 
 ## Acknowledgments
 
-- [Ghostscript](https://ghostscript.com/) - PDF compression engine (AGPL)
+- [Ghostscript](https://ghostscript.com/) - PDF compression and thumbnail engine (AGPL)
 - [pdfcpu](https://github.com/pdfcpu/pdfcpu) - PDF processing library (Apache 2.0)
 - [Wails](https://wails.io/) - Go + Web frontend framework (MIT)
