@@ -91,9 +91,11 @@ func GenerateAllThumbnails(ctx context.Context, pdfPath string, width, height in
 		"-dNOPAUSE",
 		"-dBATCH",
 		"-sDEVICE=png16m",
-		"-r72", // 72 DPI for thumbnails
+		"-r96", // 96 DPI for better quality thumbnails
 		fmt.Sprintf("-g%dx%d", width, height),
 		"-dPDFFitPage",
+		"-dTextAlphaBits=4",   // Anti-aliasing for text
+		"-dGraphicsAlphaBits=4", // Anti-aliasing for graphics
 		fmt.Sprintf("-sOutputFile=%s", outPattern),
 		pdfPath,
 	}
@@ -176,9 +178,11 @@ func GenerateThumbnail(ctx context.Context, pdfPath string, pageIndex int, width
 		"-dNOPAUSE",
 		"-dBATCH",
 		"-sDEVICE=png16m",
-		"-r72",
+		"-r96",
 		fmt.Sprintf("-g%dx%d", width, height),
 		"-dPDFFitPage",
+		"-dTextAlphaBits=4",
+		"-dGraphicsAlphaBits=4",
 		fmt.Sprintf("-dFirstPage=%d", gsPageNum),
 		fmt.Sprintf("-dLastPage=%d", gsPageNum),
 		fmt.Sprintf("-sOutputFile=%s", cachePath),

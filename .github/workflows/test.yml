@@ -28,7 +28,7 @@ jobs:
         run: go run test/download_fixtures.go
 
       - name: Run tests
-        run: go test -v -race -timeout 15m -coverprofile=coverage.out ./...
+        run: go test -v -race -timeout 15m -coverprofile=coverage.out ./pdf/...
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

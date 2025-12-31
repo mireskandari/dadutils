@@ -43,8 +43,8 @@ func getBundledGSPath() (string, error) {
 	switch runtime.GOOS {
 	case "darwin":
 		// macOS: .app/Contents/MacOS/binary -> .app/Contents/Resources/gs
-		macOSDir := filepath.Dir(exePath)                   // Contents/MacOS
-		contentsDir := filepath.Dir(macOSDir)               // Contents
+		macOSDir := filepath.Dir(exePath)     // Contents/MacOS
+		contentsDir := filepath.Dir(macOSDir) // Contents
 		resourcesDir := filepath.Join(contentsDir, "Resources")
 		return filepath.Join(resourcesDir, "gs"), nil
 

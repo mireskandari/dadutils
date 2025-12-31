@@ -68,11 +68,11 @@ func CompressPDF(ctx context.Context, inputPath string, preset CompressionPreset
 
 	// Build Ghostscript command
 	args := []string{
-		"-q",                    // Quiet mode
-		"-dNOPAUSE",             // Don't pause between pages
-		"-dBATCH",               // Exit after processing
-		"-dSAFER",               // Restrict file operations
-		"-sDEVICE=pdfwrite",     // Output device
+		"-q",                // Quiet mode
+		"-dNOPAUSE",         // Don't pause between pages
+		"-dBATCH",           // Exit after processing
+		"-dSAFER",           // Restrict file operations
+		"-sDEVICE=pdfwrite", // Output device
 		"-dCompatibilityLevel=1.4",
 		fmt.Sprintf("-dPDFSETTINGS=%s", config.setting),
 		"-dEmbedAllFonts=true",

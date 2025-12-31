@@ -172,9 +172,13 @@
 
   .checkbox-wrapper {
     position: relative;
-    width: 20px;
-    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
     cursor: pointer;
+    flex-shrink: 0;
   }
 
   .checkbox-wrapper input {
@@ -186,15 +190,15 @@
   }
 
   .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border: 2px solid var(--border-color);
-    border-radius: 5px;
+    border-radius: 6px;
     background: var(--bg-secondary);
     transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .checkbox-wrapper:hover .checkmark {
@@ -208,15 +212,13 @@
 
   .checkmark:after {
     content: '';
-    position: absolute;
     display: none;
-    left: 5px;
-    top: 2px;
     width: 5px;
-    height: 9px;
+    height: 10px;
     border: solid white;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
+    margin-bottom: 2px;
   }
 
   .checkbox-wrapper input:checked ~ .checkmark:after {

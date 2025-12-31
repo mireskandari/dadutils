@@ -47,7 +47,7 @@
   // Generate thumbnail for a document (first page only for list view)
   async function generateThumbnail(doc) {
     try {
-      const results = await GenerateAllThumbnails(doc.path, 50, 70);
+      const results = await GenerateAllThumbnails(doc.path, 80, 110);
       if (results && results.length > 0) {
         thumbnails = { ...thumbnails, [doc.id]: results[0].imageData };
       }
@@ -60,7 +60,7 @@
   async function generateEditThumbnails(doc) {
     try {
       editPageThumbnails = [];
-      const results = await GenerateAllThumbnails(doc.path, 80, 110);
+      const results = await GenerateAllThumbnails(doc.path, 120, 165);
       if (results) {
         editPageThumbnails = results;
       }
