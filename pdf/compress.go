@@ -1,27 +1,26 @@
 package pdf
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
-
-	"github.com/pdfcpu/pdfcpu/pkg/api"
-	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
+	"os/exec"
 )
 
-// presetConfigs maps compression presets to pdfcpu optimization configs
-var presetConfigs = map[CompressionPreset]struct {
-	imageQuality int
-	description  string
+// gsPresetSettings maps compression presets to Ghostscript -dPDFSETTINGS values
+var gsPresetSettings = map[CompressionPreset]struct {
+	setting     string
+	description string
 }{
-	PresetScreen:   {imageQuality: 20, description: "Screen quality (smallest)"},
-	PresetEbook:    {imageQuality: 50, description: "eBook quality"},
-	PresetPrinter:  {imageQuality: 75, description: "Printer quality"},
-	PresetPrepress: {imageQuality: 90, description: "Prepress quality"},
-	PresetDefault:  {imageQuality: 85, description: "Default quality"},
+	PresetScreen:   {setting: "/screen", description: "Screen quality (72 dpi, smallest)"},
+	PresetEbook:    {setting: "/ebook", description: "eBook quality (150 dpi)"},
+	PresetPrinter:  {setting: "/printer", description: "Printer quality (300 dpi)"},
+	PresetPrepress: {setting: "/prepress", description: "Prepress quality (300 dpi, color preserving)"},
+	PresetDefault:  {setting: "/default", description: "Default quality"},
 }
 
-// CompressPDF compresses a PDF file with the given preset
+// CompressPDF compresses a PDF file using Ghostscript with the given preset
 func CompressPDF(ctx context.Context, inputPath string, preset CompressionPreset) (*CompressionResult, error) {
 	// Get original file size
 	originalInfo, err := os.Stat(inputPath)
@@ -30,6 +29,11 @@ func CompressPDF(ctx context.Context, inputPath string, preset CompressionPreset
 	}
 	originalSize := originalInfo.Size()
 
+	// Validate file is not empty
+	if originalSize == 0 {
+		return nil, fmt.Errorf("file is empty")
+	}
+
 	// Emit initial progress
 	safeEmit(ctx, "compress:progress", ProgressUpdate{
 		Percent: 10,
@@ -37,12 +41,18 @@ func CompressPDF(ctx context.Context, inputPath string, preset CompressionPreset
 	})
 	safeEmit(ctx, "compress:log", fmt.Sprintf("Input file: %s (%s)", originalInfo.Name(), FormatFileSize(originalSize)))
 
-	// Get preset config
-	config, ok := presetConfigs[preset]
-	if !ok {
-		config = presetConfigs[PresetDefault]
+	// Find Ghostscript
+	gsPath, err := GetGhostscriptPath()
+	if err != nil {
+		return nil, fmt.Errorf("ghostscript not available: %w. %s", err, GhostscriptInstallInstructions())
 	}
+	safeEmit(ctx, "compress:log", fmt.Sprintf("Using Ghostscript: %s", gsPath))
 
+	// Get preset config
+	config, ok := gsPresetSettings[preset]
+	if !ok {
+		config = gsPresetSettings[PresetDefault]
+	}
 	safeEmit(ctx, "compress:log", fmt.Sprintf("Using preset: %s", config.description))
 
 	// Create temp output file
@@ -53,50 +63,47 @@ func CompressPDF(ctx context.Context, inputPath string, preset CompressionPreset
 
 	safeEmit(ctx, "compress:progress", ProgressUpdate{
 		Percent: 20,
-		Message: "Optimizing PDF structure...",
+		Message: "Running Ghostscript compression...",
 	})
 
-	// Create optimization configuration
-	conf := model.NewDefaultConfiguration()
-	conf.Cmd = model.OPTIMIZE
-
-	// Optimize the PDF
-	safeEmit(ctx, "compress:log", "Running optimization pass...")
-	if err := api.OptimizeFile(inputPath, outputPath, conf); err != nil {
-		CleanupTempFiles(outputPath)
-		return nil, fmt.Errorf("optimization failed: %w", err)
+	// Build Ghostscript command
+	args := []string{
+		"-q",                    // Quiet mode
+		"-dNOPAUSE",             // Don't pause between pages
+		"-dBATCH",               // Exit after processing
+		"-dSAFER",               // Restrict file operations
+		"-sDEVICE=pdfwrite",     // Output device
+		"-dCompatibilityLevel=1.4",
+		fmt.Sprintf("-dPDFSETTINGS=%s", config.setting),
+		"-dEmbedAllFonts=true",
+		"-dSubsetFonts=true",
+		"-dCompressFonts=true",
+		"-dColorImageDownsampleType=/Bicubic",
+		"-dGrayImageDownsampleType=/Bicubic",
+		"-dMonoImageDownsampleType=/Bicubic",
+		fmt.Sprintf("-sOutputFile=%s", outputPath),
+		inputPath,
 	}
 
+	safeEmit(ctx, "compress:log", "Running Ghostscript...")
+
+	// Execute Ghostscript
+	cmd := exec.CommandContext(ctx, gsPath, args...)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
 	safeEmit(ctx, "compress:progress", ProgressUpdate{
-		Percent: 60,
-		Message: "Compressing images...",
+		Percent: 50,
+		Message: "Compressing PDF...",
 	})
 
-	// If preset requires image compression, do a second pass
-	if config.imageQuality < 85 {
-		safeEmit(ctx, "compress:log", fmt.Sprintf("Compressing images to %d%% quality...", config.imageQuality))
-
-		// Create another temp file for image compression
-		finalPath, err := CreateTempFile("final", ".pdf")
-		if err != nil {
-			CleanupTempFiles(outputPath)
-			return nil, fmt.Errorf("cannot create temp file: %w", err)
-		}
-
-		// Copy the optimized file for now (pdfcpu image compression is limited)
-		// In a full implementation, we'd use more sophisticated image recompression
-		input, err := os.ReadFile(outputPath)
-		if err != nil {
-			CleanupTempFiles(outputPath, finalPath)
-			return nil, fmt.Errorf("cannot read optimized file: %w", err)
-		}
-		if err := os.WriteFile(finalPath, input, 0644); err != nil {
-			CleanupTempFiles(outputPath, finalPath)
-			return nil, fmt.Errorf("cannot write final file: %w", err)
-		}
-
+	if err := cmd.Run(); err != nil {
 		CleanupTempFiles(outputPath)
-		outputPath = finalPath
+		errMsg := stderr.String()
+		if errMsg != "" {
+			return nil, fmt.Errorf("ghostscript failed: %s", errMsg)
+		}
+		return nil, fmt.Errorf("ghostscript failed: %w", err)
 	}
 
 	safeEmit(ctx, "compress:progress", ProgressUpdate{

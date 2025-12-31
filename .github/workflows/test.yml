@@ -21,6 +21,9 @@ jobs:
         with:
           go-version: '1.24'
 
+      - name: Install Ghostscript
+        run: sudo apt-get update && sudo apt-get install -y ghostscript
+
       - name: Download test fixtures
         run: go run test/download_fixtures.go
 

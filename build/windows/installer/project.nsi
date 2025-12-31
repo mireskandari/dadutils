@@ -88,6 +88,12 @@ Section
 
     !insertmacro wails.files
 
+    # Install Ghostscript for PDF compression
+    SetOutPath "$INSTDIR\gs"
+    File "..\..\..\binaries\windows\gswin64c.exe"
+    File "..\..\..\binaries\windows\gsdll64.dll"
+    SetOutPath $INSTDIR
+
     CreateShortcut "$SMPROGRAMS\${INFO_PRODUCTNAME}.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}"
     CreateShortCut "$DESKTOP\${INFO_PRODUCTNAME}.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}"
 

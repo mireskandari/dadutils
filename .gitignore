@@ -1,3 +1,7 @@
 build/bin
 node_modules
 frontend/dist
+
+# Ghostscript binaries (too large for git, download separately)
+binaries/darwin/
+binaries/windows/

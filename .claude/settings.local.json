@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:ghostscript.com)",
+      "WebFetch(domain:wails.io)"
+    ]
+  }
+}
