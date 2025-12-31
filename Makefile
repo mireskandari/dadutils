@@ -16,10 +16,10 @@ build:
 build-mac:
 	wails build -platform darwin/universal
 	@echo "Bundling Ghostscript for macOS..."
-	@mkdir -p build/bin/DadsPDFTools.app/Contents/Resources
+	@mkdir -p build/bin/DadPDFStuff.app/Contents/Resources
 	@if [ -f binaries/darwin/gs ]; then \
-		cp binaries/darwin/gs build/bin/DadsPDFTools.app/Contents/Resources/gs; \
-		chmod +x build/bin/DadsPDFTools.app/Contents/Resources/gs; \
+		cp binaries/darwin/gs build/bin/DadPDFStuff.app/Contents/Resources/gs; \
+		chmod +x build/bin/DadPDFStuff.app/Contents/Resources/gs; \
 		echo "Ghostscript bundled successfully"; \
 	else \
 		echo "Warning: binaries/darwin/gs not found. Download it first."; \

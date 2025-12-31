@@ -3,7 +3,9 @@
     "allow": [
       "WebSearch",
       "WebFetch(domain:ghostscript.com)",
-      "WebFetch(domain:wails.io)"
+      "WebFetch(domain:wails.io)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)"
     ]
   }
 }

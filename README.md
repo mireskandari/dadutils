@@ -4,8 +4,8 @@ A lightweight, open-source PDF toolset built with [Wails](https://wails.io/) (Go
 
 Get the latest release for your platform:
 
-- **Windows**: [Download Installer](https://github.com/mireskandari/dadjoke/releases/latest)
-- **macOS (Apple Silicon)**: [Download ZIP](https://github.com/mireskandari/dadjoke/releases/latest)
+- **Windows**: [Download Installer](https://github.com/mireskandari/dadutils/releases/latest)
+- **macOS (Apple Silicon)**: [Download ZIP](https://github.com/mireskandari/dadutils/releases/latest)
 
 ## Features
 

@@ -42,7 +42,7 @@
 </script>
 
 <div class="home">
-  <h1 class="title">Dad's PDF Tools</h1>
+  <h1 class="title">Dad PDF Stuff</h1>
   <p class="subtitle">What would you like to do?</p>
 
   <div class="tools-grid">
